@@ -1,21 +1,58 @@
-//
-//  ContentView.swift
-//  Bookworm
-//
-//  Created by Вадим Исламов on 23.12.2023.
-//
-
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+    @Environment(\.modelContext) var modelContext
+    @Query(sort: [SortDescriptor(\Book.title, order: .reverse)]) var books: [Book]
+    @State private var showingAddScreen = false
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            List {
+                ForEach(books) { book in
+                    NavigationLink(value: book) {
+                        HStack {
+                            EmojiRatingView(rating: book.rating)
+                                .font(.largeTitle)
+
+                            VStack(alignment: .leading) {
+                                Text(book.title)
+                                    .font(.headline)
+                                Text(book.author)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+                .onDelete(perform: deleteBooks)
+            }
+               .navigationTitle("Bookworm")
+               .toolbar {
+                   ToolbarItem(placement: .topBarTrailing) {
+                       Button("Add Book", systemImage: "plus") {
+                           showingAddScreen.toggle()
+                       }
+                   }
+                   ToolbarItem(placement: .topBarLeading) {
+                       EditButton()
+                   }
+               }
+               .sheet(isPresented: $showingAddScreen) {
+                   AddBookView()
+            }
+               .navigationDestination(for: Book.self) { book in
+                   DetailView(book: book)
+            }
         }
-        .padding()
+    }
+    
+    func deleteBooks(at offsets: IndexSet) {
+        for offset in offsets {
+            // find this book in our query
+            let book = books[offset]
+
+            // delete it from the context
+            modelContext.delete(book)
+        }
     }
 }
 

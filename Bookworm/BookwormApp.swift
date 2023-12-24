@@ -1,10 +1,3 @@
-//
-//  BookwormApp.swift
-//  Bookworm
-//
-//  Created by Вадим Исламов on 23.12.2023.
-//
-
 import SwiftUI
 
 @main
@@ -13,5 +6,6 @@ struct BookwormApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Book.self)
     }
 }
