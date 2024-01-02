@@ -19,4 +19,5 @@ class Book {  init
     var genre: String
     var review: String
     var rating: Int
+    var date = Date.now
 }
